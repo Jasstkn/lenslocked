@@ -18,6 +18,7 @@ func pathHandler(w http.ResponseWriter, r *http.Request) {
 		contactHandler(w, r)
 	default:
 		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprint(w, "page not found ")
 	}
 }
 
