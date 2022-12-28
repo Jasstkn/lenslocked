@@ -2,51 +2,38 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"path/filepath"
 
+	"github.com/Jasstkn/lenslocked/views"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	err := executeTemplate(w, "home")
-	if err != nil {
-		log.Printf("executing template: %v", err)
-		http.Error(w, "There was an error while executing the template", http.StatusInternalServerError)
-	}
+	tplPath := filepath.Join("templates", "home.gohtml")
+	executeTemplate(w, tplPath)
 }
 
 func contactHandler(w http.ResponseWriter, r *http.Request) {
-	err := executeTemplate(w, "contact")
-	if err != nil {
-		log.Printf("executing template: %v", err)
-		http.Error(w, "There was an error while executing the template", http.StatusInternalServerError)
-	}
+	tplPath := filepath.Join("templates", "contact.gohtml")
+	executeTemplate(w, tplPath)
 }
 
 func faqHandler(w http.ResponseWriter, r *http.Request) {
-	err := executeTemplate(w, "faq")
-	if err != nil {
-		log.Printf("executing template: %v", err)
-		http.Error(w, "There was an error while executing the template", http.StatusInternalServerError)
-	}
+	tplPath := filepath.Join("templates", "faq.gohtml")
+	executeTemplate(w, tplPath)
 }
 
-func executeTemplate(w http.ResponseWriter, filename string) error {
-	// build path for any OS
-	tplPath := filepath.Join("templates", filename+".gohtml")
-	tpl, err := template.ParseFiles(tplPath)
+func executeTemplate(w http.ResponseWriter, filepath string) {
+	t, err := views.Parse(filepath)
 	if err != nil {
-		return err
+		log.Printf("parsing template: %v", err)
+		http.Error(w, "There was an error parsing the template.", http.StatusInternalServerError)
+		return
 	}
-	err = tpl.Execute(w, nil)
-	if err != nil {
-		return err
-	}
-	return nil
+	t.Execute(w, nil)
 }
 
 func main() {
