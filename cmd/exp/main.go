@@ -1,23 +1,28 @@
 package main
 
 import (
-	"html/template"
-	"os"
+	"errors"
+	"fmt"
 )
 
+var ErrNotFound = errors.New("not found")
+
 func main() {
-	type User struct {
-		Name string
+	err := B()
+	if errors.Is(err, ErrNotFound) {
+		fmt.Print("error is ErrNotFound")
 	}
+	fmt.Print("unknown error")
+}
 
-	t, err := template.ParseFiles("hello.gohtml")
-	if err != nil {
-		panic(err)
-	}
-	user := User{Name: "John Smith"}
+func A() error {
+	return ErrNotFound
+}
 
-	err = t.Execute(os.Stdout, user)
+func B() error {
+	err := A()
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("b: %w", err)
 	}
+	return nil
 }
