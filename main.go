@@ -15,16 +15,18 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
+	layoutTpl := "layout-parts.gohtml"
+
 	r.Get("/", controllers.StaticHandler(
-		views.Must(views.ParseFS(templates.FS, "home.gohtml")),
+		views.Must(views.ParseFS(templates.FS, "home.gohtml", layoutTpl)),
 	))
 
 	r.Get("/contact", controllers.StaticHandler(
-		views.Must(views.ParseFS(templates.FS, "contact.gohtml")),
+		views.Must(views.ParseFS(templates.FS, "contact.gohtml", layoutTpl)),
 	))
 
 	r.Get("/faq", controllers.FAQ(
-		views.Must(views.ParseFS(templates.FS, "faq.gohtml")),
+		views.Must(views.ParseFS(templates.FS, "faq.gohtml", layoutTpl)),
 	))
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
