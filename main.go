@@ -15,7 +15,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
-	layoutTpl := "layout-parts.gohtml"
+	layoutTpl := "tailwind.gohtml"
 
 	r.Get("/", controllers.StaticHandler(
 		views.Must(views.ParseFS(templates.FS, "home.gohtml", layoutTpl)),
