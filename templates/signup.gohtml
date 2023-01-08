@@ -1,0 +1,21 @@
+{{template "header" . }}
+{{/*
+TODO: think about form action
+*/}}
+<form action="/users" method="post">
+  <div>
+    <label for="email">Email Address</label>
+    <input required name="email" id="email" type="email" placeholder="Email address" autocomplete="email"/>
+  </div>
+  <div>
+    <label for="password">Password</label>
+    {{/*
+    TODO: add a button to reveal a password
+    */}}
+    <input required name="password" id="password" type="password" placeholder="Password"/>
+  </div>
+  <div>
+    <button type="submit">Sign up</button>
+  </div>
+</form>
+{{template "footer" . }}
