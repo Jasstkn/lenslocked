@@ -31,6 +31,7 @@ func main() {
 		"signup.gohtml", layoutTpl,
 	))
 	r.Get("/signup", usersC.New)
+	r.Post("/users", usersC.Create)
 
 	r.Get("/faq", controllers.FAQ(
 		views.Must(views.ParseFS(templates.FS, "faq.gohtml", layoutTpl)),
