@@ -1,0 +1,52 @@
+version: "3"
+
+vars:
+  APP: lenslocked
+  VERSION:
+    sh: git describe --tags --abbrev=0
+  GIT_COMMIT:
+    sh: git rev-parse --short HEAD
+
+env:
+  LDFLAGS: "-X main.Version={{.VERSION}} -X main.GitCommit={{.GIT_COMMIT}}"
+
+tasks:
+  build:
+    desc: Build app with version
+    cmds:
+      - task: deps
+      - go build -ldflags="$LDFLAGS" -o {{.APP}} main.go
+
+  test:
+    desc: Run tests
+    cmds:
+      - task: deps
+      - go test ./... {{.CLI_ARGS}}
+
+  coverage:
+    desc: Run tests and generate coverage report
+    cmds:
+      - go test -v ./... -race -coverprofile=coverage.out -covermode=atomic
+
+  clean:
+    desc: Run tests without cache
+    cmds:
+      - go clean -testcache
+      - task: test
+
+  deps:
+    desc: Install dependencies
+    cmds:
+      - go mod tidy
+
+  docker-build:
+    desc: Build container image
+    cmds:
+      - |
+        docker build -t {{.APP}}:{{.VERSION}}-{{.GIT_COMMIT}} \
+          --build-arg LDFLAGS="$LDFLAGS" \
+          -f Dockerfile .
+  docker-run:
+    desc: Run container image
+    cmds:
+      - docker run {{.APP}}:{{.VERSION}}-{{.GIT_COMMIT}} {{.CLI_ARGS}}
