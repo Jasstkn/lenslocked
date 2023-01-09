@@ -4,6 +4,7 @@
     "**/node_modules/**",
     "**/vscode-extension/**",
     "**/.git/**",
+    "**/.github/**",
     "**/.pnpm-lock.json",
     ".vscode",
     "megalinter",
