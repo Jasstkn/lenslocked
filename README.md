@@ -4,14 +4,33 @@
 
 A photo gallery website.
 
-## Build
+## Architecture
 
 TBD.
+
+## DB schema
+
+TBD.
+
+## Build
+
+```shell
+task build
+```
 
 ## Test
 
-TBD.
+```shell
+task test
+```
 
-## Example of usage
+## How to run
 
-TBD.
+Database should be up & running.
+
+```shell
+lenslocked
+```
+
+## TODO
+- [ ] Disallow to repeat last N passwords
