@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+
 	"github.com/Jasstkn/lenslocked/controllers"
 	"github.com/Jasstkn/lenslocked/templates"
 	"github.com/Jasstkn/lenslocked/views"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 )
 
 func main() {
@@ -43,5 +44,8 @@ func main() {
 
 	fmt.Println("Starting the server on http://localhost:3000")
 
-	http.ListenAndServe(":3000", r)
+	err := http.ListenAndServe(":3000", r)
+	if err != nil {
+		panic(err)
+	}
 }
