@@ -49,7 +49,7 @@ func (us UserService) Authenticate(email, password string) (*User, error) {
 
 	row := us.DB.QueryRow(`
 		SELECT id, password_hash from users
-		WHERE email = '$1'`, email)
+		WHERE email = $1`, email)
 	err := row.Scan(&user.ID, &user.PasswordHash)
 	if err != nil {
 		return nil, fmt.Errorf("authenticate: %w", err)

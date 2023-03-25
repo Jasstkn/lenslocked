@@ -51,8 +51,9 @@ func main() {
 
 	r.Get("/signup", usersC.New)
 	r.Get("/signin", usersC.SignIn)
-	
+
 	r.Post("/users", usersC.Create)
+	r.Post("/signin", usersC.ProcessSignIn)
 
 	r.Get("/faq", controllers.FAQ(
 		views.Must(views.ParseFS(templates.FS, "faq.gohtml", layoutTpl)),
