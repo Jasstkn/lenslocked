@@ -1,7 +1,9 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
+	"github.com/Jasstkn/lenslocked/models"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -26,7 +28,18 @@ func main() {
 		views.Must(views.ParseFS(templates.FS, "contact.gohtml", layoutTpl)),
 	))
 
-	usersC := controllers.Users{}
+	cfg := models.DefaultPostgresConfig()
+	db, err := sql.Open("pgx", cfg.String())
+	defer db.Close()
+
+	userService := models.UserService{DB: db}
+	if err != nil {
+		panic(err)
+	}
+
+	usersC := controllers.Users{
+		UserService: &userService, // TODO: configure db connection
+	}
 	usersC.Templates.New = views.Must(views.ParseFS(
 		templates.FS,
 		"signup.gohtml", layoutTpl,
