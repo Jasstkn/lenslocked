@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/Jasstkn/lenslocked/models"
 	"net/http"
+
+	"github.com/Jasstkn/lenslocked/models"
 )
 
 type Users struct {
@@ -43,6 +44,12 @@ func (u Users) ProcessSignIn(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Something went wrong.", http.StatusInternalServerError)
 		return
 	}
+	cookie := http.Cookie{
+		Name:  "email",
+		Value: user.Email,
+		Path:  "/", // limit cookie to this path
+	}
+	http.SetCookie(w, &cookie)
 	fmt.Fprintf(w, "User authenticated: %s", user.Email)
 }
 
