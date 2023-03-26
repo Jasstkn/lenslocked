@@ -74,6 +74,7 @@ func main() {
 	})
 
 	fmt.Println("Starting the server on http://localhost:3000")
+
 	csrfKey := os.Getenv("CSRF_KEY")
 	csrfMiddleware := csrf.Protect(
 		[]byte(csrfKey),
