@@ -3,8 +3,9 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/Jasstkn/lenslocked/models"
 	"net/http"
+
+	"github.com/Jasstkn/lenslocked/models"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -30,7 +31,12 @@ func main() {
 
 	cfg := models.DefaultPostgresConfig()
 	db, err := sql.Open("pgx", cfg.String())
-	defer db.Close()
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(db)
 
 	userService := models.UserService{DB: db}
 	if err != nil {

@@ -1,0 +1,31 @@
+# all available settings of specific linters
+linters-settings:
+  goimports:
+    local-prefixes: github.com/Jasstkn/lenslocked
+  staticcheck:
+    go: "1.19"
+  unused:
+    go: "1.19"
+
+linters:
+  # please, do not use `enable-all`: it's deprecated and will be removed soon.
+  # inverted configuration with `enable-all` and `disable` is not scalable during updates of golangci-lint
+  disable-all: true
+  enable:
+    - depguard
+    - dogsled
+    - errcheck
+    - goerr113
+    - gofmt
+    - goimports
+    - goprintffuncname
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - staticcheck
+    - stylecheck
+    - typecheck
+    - unconvert
+    - unused
+    - whitespace
