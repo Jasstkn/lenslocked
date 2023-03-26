@@ -4,6 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"os"
+
+	"github.com/gorilla/csrf"
 
 	"github.com/Jasstkn/lenslocked/models"
 
@@ -71,8 +74,12 @@ func main() {
 	})
 
 	fmt.Println("Starting the server on http://localhost:3000")
-
-	err = http.ListenAndServe(":3000", r)
+	csrfKey := os.Getenv("CSRF_KEY")
+	csrfMiddleware := csrf.Protect(
+		[]byte(csrfKey),
+		// TODO: make configurable
+		csrf.Secure(false))
+	err = http.ListenAndServe(":3000", csrfMiddleware(r))
 	if err != nil {
 		panic(err)
 	}
