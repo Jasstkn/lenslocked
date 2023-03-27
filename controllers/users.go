@@ -69,9 +69,9 @@ func (u Users) ProcessSignIn(w http.ResponseWriter, r *http.Request) {
 
 func (u Users) CurrentUser(w http.ResponseWriter, r *http.Request) {
 	emailCookie, err := r.Cookie("email")
-	// TODO: redirect to sign in page
 	if err != nil {
-		fmt.Fprintf(w, "The email cookie could not be read.")
+		http.Redirect(w, r, "http://localhost:3000/signin", http.StatusSeeOther)
+		return
 	}
 	fmt.Fprintf(w, "Email cookie: %s\n", emailCookie.Value)
 	fmt.Fprintf(w, "Headers: %+v\n", r.Header)
