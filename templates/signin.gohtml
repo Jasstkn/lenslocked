@@ -8,7 +8,9 @@
     TODO: think about form action
     */}}
     <form action="/signin" method="post">
-      {{csrfField}}
+      <div class="hidden">
+        {{csrfField}}
+      </div>
       <div class="py-2">
         <label for="email" class="text-sm font-semibold">Email Address</label>
         <input required name="email" id="email" type="email" placeholder="user@example.com" autocomplete="email"
