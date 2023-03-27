@@ -35,7 +35,7 @@ lenslocked
 ## Development
 
 ```shell
-CSRF_TOKEN=secret-value task dev
+CSRF_KEY=secret-value task dev
 ```
 
 ## TODO
