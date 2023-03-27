@@ -32,5 +32,11 @@ Database should be up & running.
 lenslocked
 ```
 
+## Development
+
+```shell
+CSRF_TOKEN=secret-value task dev
+```
+
 ## TODO
 - [ ] Disallow to repeat last N passwords
