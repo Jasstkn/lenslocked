@@ -3,3 +3,5 @@
 lenslocked
 .idea/
 bcrypt
+
+megalinter-reports/*
