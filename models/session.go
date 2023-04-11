@@ -1,7 +1,9 @@
 package models
 
 import (
+	"crypto/sha256"
 	"database/sql"
+	"encoding/base64"
 	"fmt"
 
 	"github.com/Jasstkn/lenslocked/rand"
@@ -39,11 +41,10 @@ func (ss *SessionService) Create(userID int) (*Session, error) {
 		return nil, fmt.Errorf("create: %w", err)
 	}
 
-	// TODO: Hash the session token
 	session := Session{
-		UserID: userID,
-		Token:  token,
-		// Set the TokenHash
+		UserID:    userID,
+		Token:     token,
+		TokenHash: ss.hash(token),
 	}
 
 	// TODO: Store the session in our DB
@@ -53,6 +54,13 @@ func (ss *SessionService) Create(userID int) (*Session, error) {
 func (ss *SessionService) User(token string) (*User, error) {
 	// TODO: implement SessionService.User
 	return nil, nil
+}
+
+// hash function hash token with sha256.Sum256 function
+// it takes token as an argument and returns hashed token string
+func (ss *SessionService) hash(token string) string {
+	tokenHash := sha256.Sum256([]byte(token))
+	return base64.URLEncoding.EncodeToString(tokenHash[:])
 }
 
 // MaxInt function return the maximum between 2 integers
