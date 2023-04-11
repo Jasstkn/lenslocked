@@ -4,14 +4,18 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/Jasstkn/lenslocked/models"
 
 	_ "github.com/jackc/pgx/v4/stdlib"
+
+	"github.com/Jasstkn/lenslocked/models"
 )
 
 func main() {
 	cfg := models.DefaultPostgresConfig()
 	db, err := sql.Open("pgx", cfg.String())
+	if err != nil {
+		panic(err)
+	}
 	defer db.Close()
 
 	if err != nil {

@@ -22,7 +22,7 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 	tpl = tpl.Funcs(
 		template.FuncMap{
 			"csrfField": func() (template.HTML, error) {
-				return "", fmt.Errorf("csrfField not implemeneted")
+				return "", fmt.Errorf("csrfField not implemeneted") //nolint:goerr113
 			},
 		},
 	)
@@ -73,5 +73,5 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface
 		http.Error(w, "There was an error executing the template.", http.StatusInternalServerError)
 		return
 	}
-	io.Copy(w, &buffer)
+	io.Copy(w, &buffer) //nolint:errcheck
 }

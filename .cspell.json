@@ -1,6 +1,5 @@
-
 {
-"ignorePaths": [
+  "ignorePaths": [
     "**/node_modules/**",
     "**/vscode-extension/**",
     "**/.git/**",
@@ -10,9 +9,9 @@
     "megalinter",
     "package-lock.json",
     "report"
-],
-"language": "en",
-"noConfigSearch": true,
-"words": ["megalinter", "oxsecurity"],
-"version": "0.2"
+  ],
+  "language": "en",
+  "noConfigSearch": true,
+  "words": ["megalinter", "oxsecurity"],
+  "version": "0.2"
 }

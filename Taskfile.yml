@@ -31,4 +31,3 @@ tasks:
     desc: Install dependencies
     cmds:
       - go mod tidy
-
