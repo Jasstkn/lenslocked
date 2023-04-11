@@ -31,3 +31,8 @@ tasks:
     desc: Install dependencies
     cmds:
       - go mod tidy
+
+  lint:
+    desc: Run linter
+    cmds:
+      - golangci-lint run .
