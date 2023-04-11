@@ -34,6 +34,9 @@ func main() {
 
 	cfg := models.DefaultPostgresConfig()
 	db, err := sql.Open("pgx", cfg.String())
+	if err != nil {
+		panic(err)
+	}
 	defer func(db *sql.DB) {
 		err := db.Close()
 		if err != nil {
@@ -42,12 +45,11 @@ func main() {
 	}(db)
 
 	userService := models.UserService{DB: db}
-	if err != nil {
-		panic(err)
-	}
+	sessionService := models.SessionService{DB: db}
 
 	usersC := controllers.Users{
-		UserService: &userService, // TODO: configure db connection
+		UserService:    &userService,
+		SessionService: &sessionService,
 	}
 	usersC.Templates.New = views.Must(views.ParseFS(
 		templates.FS,
