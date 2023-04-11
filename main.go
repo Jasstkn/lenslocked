@@ -61,13 +61,12 @@ func main() {
 	r.Get("/signup", usersC.New)
 	r.Get("/signin", usersC.SignIn)
 	r.Get("/users/me", usersC.CurrentUser)
-
-	r.Post("/users", usersC.Create)
-	r.Post("/signin", usersC.ProcessSignIn)
-
 	r.Get("/faq", controllers.FAQ(
 		views.Must(views.ParseFS(templates.FS, "faq.gohtml", layoutTpl)),
 	))
+
+	r.Post("/users", usersC.Create)
+	r.Post("/signin", usersC.ProcessSignIn)
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "page not found", http.StatusNotFound)
