@@ -28,6 +28,9 @@ func setCookie(w http.ResponseWriter, name, value string) {
 	http.SetCookie(w, cookie)
 }
 
+// readCookie is a function that return cookie value
+// it takes *http.Request and name of the cookie
+// returns cookie's value and error
 func readCookie(r *http.Request, name string) (string, error) {
 	c, err := r.Cookie(name)
 	if err != nil {
