@@ -6,7 +6,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/gorilla/csrf v1.7.1
 	github.com/jackc/pgx/v4 v4.18.1
-	golang.org/x/crypto v0.8.0
+	golang.org/x/crypto v0.9.0
 )
 
 require (
