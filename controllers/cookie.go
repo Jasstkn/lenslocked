@@ -39,3 +39,11 @@ func readCookie(r *http.Request, name string) (string, error) {
 
 	return c.Value, nil
 }
+
+// deleteCookie is a function that deletes cookie
+// it takes http.ResponseWriter and name of the cookie
+func deleteCookie(w http.ResponseWriter, name string) {
+	cookie := newCookie(name, "")
+	cookie.MaxAge = -1
+	http.SetCookie(w, cookie)
+}
