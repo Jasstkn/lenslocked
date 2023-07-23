@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/base64"
+	"errors"
 	"fmt"
 
 	"github.com/Jasstkn/lenslocked/rand"
@@ -47,12 +48,6 @@ func (ss *SessionService) Create(userID int) (*Session, error) {
 		TokenHash: ss.hash(token),
 	}
 
-	// 1. Query for a user's session
-	// 2. if found, update the user's session
-	// 3. if not found, create a new session for the user
-
-	// 1. try to update the user's session
-	// 2. if error, create a new session
 	row := ss.DB.QueryRow(`
 		UPDATE sessions
 		SET token_hash = $2
@@ -60,7 +55,7 @@ func (ss *SessionService) Create(userID int) (*Session, error) {
 
 	err = row.Scan(&session.ID)
 
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		row := ss.DB.QueryRow(`
 			INSERT INTO sessions (user_id, token_hash)
 			VALUES ($1, $2)
@@ -75,8 +70,28 @@ func (ss *SessionService) Create(userID int) (*Session, error) {
 }
 
 func (ss *SessionService) User(token string) (*User, error) {
-	// TODO: implement SessionService.User
-	return nil, nil
+	tokenHash := ss.hash(token)
+
+	var user User
+	row := ss.DB.QueryRow(`
+		SELECT user_id
+		FROM sessions
+		WHERE token_hash = $1;`, tokenHash)
+	err := row.Scan(&user.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
+
+	row = ss.DB.QueryRow(`
+		SELECT email,password_hash
+		FROM users
+		WHERE id = $1;`, user.ID)
+	err = row.Scan(&user.Email, &user.PasswordHash)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user data: %w", err)
+	}
+
+	return &user, nil
 }
 
 // hash function hash token with sha256.Sum256 function
