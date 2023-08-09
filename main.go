@@ -32,8 +32,9 @@ func main() {
 		views.Must(views.ParseFS(templates.FS, "contact.gohtml", layoutTpl)),
 	))
 
+	// open database connections
 	cfg := models.DefaultPostgresConfig()
-	db, err := sql.Open("pgx", cfg.String())
+	db, err := models.Open(cfg)
 	if err != nil {
 		panic(err)
 	}
@@ -43,6 +44,12 @@ func main() {
 			panic(err)
 		}
 	}(db)
+
+	// run migrations
+	err = models.Migrate(db, "migrations")
+	if err != nil {
+		panic(err)
+	}
 
 	userService := models.UserService{DB: db}
 	sessionService := models.SessionService{DB: db}
