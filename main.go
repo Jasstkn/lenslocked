@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/csrf"
 
+	"github.com/Jasstkn/lenslocked/migrations"
 	"github.com/Jasstkn/lenslocked/models"
 
 	"github.com/go-chi/chi/v5"
@@ -46,7 +47,7 @@ func main() {
 	}(db)
 
 	// run migrations
-	err = models.Migrate(db, "migrations")
+	err = models.MigrateFS(db, migrations.FS, ".")
 	if err != nil {
 		panic(err)
 	}
