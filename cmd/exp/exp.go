@@ -5,9 +5,15 @@ import (
 	"fmt"
 )
 
+type ctxKey string
+
+const (
+	favoriteColorKey ctxKey = "favorite-color"
+)
+
 func main() {
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, "favorite-color", "blue")
-	value := ctx.Value("favorite-color")
+	ctx = context.WithValue(ctx, favoriteColorKey, "blue")
+	value := ctx.Value(favoriteColorKey)
 	fmt.Println(value)
 }
