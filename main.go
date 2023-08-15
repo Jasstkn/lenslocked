@@ -20,20 +20,7 @@ import (
 )
 
 func main() {
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-
-	layoutTpl := "tailwind.gohtml"
-
-	r.Get("/", controllers.StaticHandler(
-		views.Must(views.ParseFS(templates.FS, "home.gohtml", layoutTpl)),
-	))
-
-	r.Get("/contact", controllers.StaticHandler(
-		views.Must(views.ParseFS(templates.FS, "contact.gohtml", layoutTpl)),
-	))
-
-	// open database connections
+	// Bootstrap the database
 	cfg := models.DefaultPostgresConfig()
 	db, err := models.Open(cfg)
 	if err != nil {
@@ -52,9 +39,23 @@ func main() {
 		panic(err)
 	}
 
+	// Setup services
 	userService := models.UserService{DB: db}
 	sessionService := models.SessionService{DB: db}
 
+	// Setup middleware
+	umw := controllers.UserMiddleware{
+		SessionService: &sessionService,
+	}
+
+	csrfKey := os.Getenv("CSRF_KEY")
+	csrfMw := csrf.Protect(
+		[]byte(csrfKey),
+		// TODO: make configurable
+		csrf.Secure(false))
+
+	// Setup controllers
+	layoutTpl := "tailwind.gohtml"
 	usersC := controllers.Users{
 		UserService:    &userService,
 		SessionService: &sessionService,
@@ -68,6 +69,20 @@ func main() {
 		"signin.gohtml", layoutTpl,
 	))
 
+	// Setup router and routes
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Use(csrfMw)
+	r.Use(umw.SetUser)
+
+	r.Get("/", controllers.StaticHandler(
+		views.Must(views.ParseFS(templates.FS, "home.gohtml", layoutTpl)),
+	))
+
+	r.Get("/contact", controllers.StaticHandler(
+		views.Must(views.ParseFS(templates.FS, "contact.gohtml", layoutTpl)),
+	))
+
 	r.Get("/signup", usersC.New)
 	r.Get("/signin", usersC.SignIn)
 	r.Get("/users/me", usersC.CurrentUser)
@@ -79,23 +94,20 @@ func main() {
 	r.Post("/signin", usersC.ProcessSignIn)
 	r.Post("/signout", usersC.ProcessSignOut)
 
+	r.Route("/users/me", func(r chi.Router) {
+		r.Use(umw.RequireUser)
+		r.Get("/", usersC.CurrentUser)
+	})
+
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "page not found", http.StatusNotFound)
 	})
 
-	umw := controllers.UserMiddleware{
-		SessionService: &sessionService,
-	}
-
-	csrfKey := os.Getenv("CSRF_KEY")
-	csrfMiddleware := csrf.Protect(
-		[]byte(csrfKey),
-		// TODO: make configurable
-		csrf.Secure(false))
-
+	// Start the server
 	fmt.Println("Starting the server on http://localhost:3000")
+
 	// csrfMiddleware runs first, then SetUser
-	err = http.ListenAndServe(":3000", csrfMiddleware(umw.SetUser(r)))
+	err = http.ListenAndServe(":3000", r)
 	if err != nil {
 		panic(err)
 	}
