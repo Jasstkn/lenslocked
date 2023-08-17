@@ -1,29 +1,25 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"strings"
-)
+	"os"
 
-type ctxKey string
-
-const (
-	favoriteColorKey ctxKey = "favorite-color"
+	"github.com/go-mail/mail/v2"
 )
 
 func main() {
-	ctx := context.Background()
+	from := "test@lenslocked.com"
+	to := "jasstkn.051@gmail.com"
+	subject := "This is a test email"
+	plaintext := "This is the body of the email"
+	html := `<h1>Hello there buddy!</h1><p>This is the email</p><p>Hope you enjoy it</p>`
 
-	ctx = context.WithValue(ctx, favoriteColorKey, "blue")
+	msg := mail.NewMessage()
+	msg.SetHeader("From", from)
+	msg.SetHeader("To", to)
+	msg.SetHeader("Subject", subject)
+	msg.SetBody("text/plain", plaintext)
+	msg.AddAlternative("text/html", html)
 
-	value := ctx.Value(favoriteColorKey)
-	strValue, ok := value.(string)
-	if !ok {
-		fmt.Println("failed to do type assertion")
-		return
-	}
+	msg.WriteTo(os.Stdout)
 
-	fmt.Println(strValue)
-	fmt.Println(strings.HasPrefix(strValue, "b"))
 }
