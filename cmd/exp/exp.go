@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
-
-	"github.com/go-mail/mail/v2"
+	"github.com/Jasstkn/lenslocked/models"
 )
 
 const (
@@ -14,23 +12,24 @@ const (
 )
 
 func main() {
-	from := "test@lenslocked.com"
-	to := "test@gmail.com"
-	subject := "This is a test email"
-	plaintext := "This is the body of the email"
-	html := `<h1>Hello there buddy!</h1><p>This is the email</p><p>Hope you enjoy it</p>`
+	email := models.Email{
+		From:    "test@lenslocked.com",
+		To:      "test@gmail.com",
+		Subject: "This is a test email",
+		// PlainText: "This is the body of the email",
+		// HTML: `<h1>Hello there buddy!</h1><p>This is the email</p><p>Hope you enjoy it</p>`,
+	}
 
-	msg := mail.NewMessage()
-	msg.SetHeader("From", from)
-	msg.SetHeader("To", to)
-	msg.SetHeader("Subject", subject)
-	msg.SetBody("text/plain", plaintext)
-	msg.AddAlternative("text/html", html)
+	es := models.NewEmailService(models.SMTPConfig{
+		Host:     host,
+		Port:     port,
+		Username: username,
+		Password: password,
+	})
 
-	dialer := mail.NewDialer(host, port, username, password)
-	err := dialer.DialAndSend(msg)
+	err := es.Send(email)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Message sent")
+
 }
