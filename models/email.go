@@ -80,6 +80,23 @@ func (es *EmailService) Send(email Email) error {
 	return nil
 }
 
+func (es *EmailService) ForgotPassword(to, resetURL string) error {
+	email := Email{
+		Subject:   "Reset your password",
+		To:        to,
+		PlainText: "To reset your password, please visit the following link: " + resetURL,
+		// TODO: replace with templates
+		HTML: `<p>To reset your password, please visit the following link: <a href="` + resetURL + `">link</a></p>`,
+	}
+
+	err := es.Send(email)
+	if err != nil {
+		return fmt.Errorf("failed to send forgot password email: %w", err)
+	}
+
+	return nil
+}
+
 // setFrom sets the from header based on the email's from field.
 // If the email's from field is empty, it will use the default sender from the email service.
 // If the email service's default sender is empty, it will use the DefaultSender constant.
