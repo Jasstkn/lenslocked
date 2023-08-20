@@ -5,3 +5,6 @@ lenslocked
 bcrypt
 
 megalinter-reports/*
+
+# ignore env variables
+.env
