@@ -20,6 +20,9 @@ tasks:
     desc: Run dev environment with PG
     cmds:
       - docker-compose up -d
+      - task: goose
+        vars:
+          CLI_ARGS: up
       - modd
 
   exec:
