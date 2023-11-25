@@ -2,6 +2,7 @@
 # code commits
 lenslocked
 .idea/
+.vscode/
 bcrypt
 
 megalinter-reports/*

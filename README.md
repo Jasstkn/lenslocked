@@ -39,4 +39,5 @@ CSRF_KEY=secret-value task dev
 ```
 
 ## TODO
+
 - [ ] Disallow to repeat last N passwords

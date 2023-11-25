@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gorilla/csrf"
+	"github.com/joho/godotenv"
 
 	"github.com/Jasstkn/lenslocked/migrations"
 	"github.com/Jasstkn/lenslocked/models"
@@ -19,10 +21,54 @@ import (
 	"github.com/Jasstkn/lenslocked/views"
 )
 
+type config struct {
+	PSQL models.PostgresConfig
+	SMTP models.SMTPConfig
+	CSRF struct {
+		Key    string
+		Secure bool
+	}
+	Server struct {
+		Address string // e.g. :3000 or localhost:3000
+	}
+}
+
+func loadEnvConfig() (config, error) {
+	var cfg config
+
+	err := godotenv.Load()
+	if err != nil {
+		return cfg, err
+	}
+
+	// TODO: Read the PSQL values from the ENV variables
+	cfg.PSQL = models.DefaultPostgresConfig()
+
+	cfg.SMTP.Host = os.Getenv("SMTP_HOST")
+	cfg.SMTP.Port, err = strconv.Atoi(os.Getenv("SMTP_PORT"))
+	if err != nil {
+		panic(err)
+	}
+	cfg.SMTP.Username = os.Getenv("SMTP_USERNAME")
+	cfg.SMTP.Password = os.Getenv("SMTP_PASSWORD")
+
+	cfg.CSRF.Key = os.Getenv("CSRF_KEY")
+	cfg.CSRF.Secure = false
+
+	// TODO: Read the server values from ENV variable
+	cfg.Server.Address = ":3000"
+
+	return cfg, nil
+}
+
 func main() {
+	cfg, err := loadEnvConfig()
+	if err != nil {
+		panic(err)
+	}
+
 	// Bootstrap the database
-	cfg := models.DefaultPostgresConfig()
-	db, err := models.Open(cfg)
+	db, err := models.Open(cfg.PSQL)
 	if err != nil {
 		panic(err)
 	}
@@ -40,25 +86,27 @@ func main() {
 	}
 
 	// Setup services
-	userService := models.UserService{DB: db}
-	sessionService := models.SessionService{DB: db}
+	userService := &models.UserService{DB: db}
+	sessionService := &models.SessionService{DB: db}
+	pwResetService := &models.PasswordResetService{DB: db}
+	emailService := models.NewEmailService(cfg.SMTP)
 
 	// Setup middleware
 	umw := controllers.UserMiddleware{
-		SessionService: &sessionService,
+		SessionService: sessionService,
 	}
 
-	csrfKey := os.Getenv("CSRF_KEY")
 	csrfMw := csrf.Protect(
-		[]byte(csrfKey),
-		// TODO: make configurable
-		csrf.Secure(false))
+		[]byte(cfg.CSRF.Key),
+		csrf.Secure(cfg.CSRF.Secure))
 
 	// Setup controllers
 	layoutTpl := "tailwind.gohtml"
 	usersC := controllers.Users{
-		UserService:    &userService,
-		SessionService: &sessionService,
+		UserService:          userService,
+		SessionService:       sessionService,
+		PasswordResetService: pwResetService,
+		EmailService:         emailService,
 	}
 	usersC.Templates.New = views.Must(views.ParseFS(
 		templates.FS,
@@ -116,10 +164,9 @@ func main() {
 	})
 
 	// Start the server
-	fmt.Println("Starting the server on http://localhost:3000")
+	fmt.Printf("Starting the server on %s\n", cfg.Server.Address)
 
-	// csrfMiddleware runs first, then SetUser
-	err = http.ListenAndServe(":3000", r)
+	err = http.ListenAndServe(cfg.Server.Address, r)
 	if err != nil {
 		panic(err)
 	}
