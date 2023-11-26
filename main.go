@@ -108,6 +108,7 @@ func main() {
 		PasswordResetService: pwResetService,
 		EmailService:         emailService,
 	}
+	// fix inconsistency between file names
 	usersC.Templates.New = views.Must(views.ParseFS(
 		templates.FS,
 		"signup.gohtml", layoutTpl,
@@ -115,6 +116,10 @@ func main() {
 	usersC.Templates.SignIn = views.Must(views.ParseFS(
 		templates.FS,
 		"signin.gohtml", layoutTpl,
+	))
+	usersC.Templates.CheckYourEmail = views.Must(views.ParseFS(
+		templates.FS,
+		"check-your-email.gohtml", layoutTpl,
 	))
 	usersC.Templates.ForgotPassword = views.Must(views.ParseFS(
 		templates.FS,
