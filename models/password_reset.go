@@ -16,8 +16,7 @@ const (
 )
 
 type PasswordReset struct {
-	ID     int
-	UserID int
+	ID int
 	// Token is only set when PasswordReset is being created.
 	// When lookup a PasswordReset this will be left empty.
 	Token     string
@@ -40,15 +39,6 @@ func (s *PasswordResetService) Create(email string) (*PasswordReset, error) {
 	// verify that we have a valid email address for a user.
 	email = strings.ToLower(email)
 
-	var userID int
-	row := s.DB.QueryRow(`
-		SELECT id FROM users WHERE email = $1;`, email)
-	err := row.Scan(&userID)
-	if err != nil {
-		// TODO: consider to return a specific error when te user doesn't exist in DB.
-		return nil, fmt.Errorf("create: %w", err)
-	}
-
 	// build the PasswordReset
 	bytesPerToken := s.BytesPerToken
 	if bytesPerToken < MinBytesPerToken {
@@ -66,19 +56,18 @@ func (s *PasswordResetService) Create(email string) (*PasswordReset, error) {
 	}
 
 	pwReset := PasswordReset{
-		UserID:    userID,
 		Token:     token,
 		TokenHash: s.hash(token),
 		ExpiresAt: time.Now().Add(duration),
 	}
 
 	// Insert the PasswordReset into the DB
-	row = s.DB.QueryRow(`
+	row := s.DB.QueryRow(`
 		INSERT INTO password_resets (user_id, token_hash, expires_at)
-		VALUES ($1, $2, $3) ON CONFLICT (user_id) DO
-		UPDATE
-		SET token_hash = $2, expires_at = $3
-		RETURNING id;`, pwReset.UserID, pwReset.TokenHash, pwReset.ExpiresAt)
+		SELECT id, $2, $3 FROM users WHERE email = $1
+		ON CONFLICT (user_id) 
+		DO UPDATE SET token_hash = $2, expires_at = $3
+		RETURNING id;`, email, pwReset.TokenHash, pwReset.ExpiresAt)
 	err = row.Scan(&pwReset.ID)
 	if err != nil {
 		return nil, fmt.Errorf("create: %w", err)
