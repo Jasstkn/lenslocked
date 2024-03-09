@@ -25,6 +25,7 @@ func newCookie(name, value string) *http.Cookie {
 // it takes http.ResponseWriter, and name and value for cookie
 func setCookie(w http.ResponseWriter, name, value string) {
 	cookie := newCookie(name, value)
+	fmt.Printf("new cookie: %s", value)
 	http.SetCookie(w, cookie)
 }
 
