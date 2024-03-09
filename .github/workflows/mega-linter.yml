@@ -50,7 +50,7 @@ jobs:
           DISABLE_ERRORS_LINTERS: REPOSITORY_DEVSKIM,GO_GOLANGCI_LINT,GO_REVIVE,REPOSITORY_CHECKOV,SQL_TSQLLINT,REPOSITORY_KICS,REPOSITORY_TRUFFLEHOG
       # Upload MegaLinter artifacts
       - name: Archive production artifacts
-        if: ${{ success() }} || ${{ failure() }}
+        if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
           name: MegaLinter reports
