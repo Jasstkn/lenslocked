@@ -41,3 +41,5 @@ CSRF_KEY=secret-value task dev
 ## TODO
 
 - [ ] Disallow to repeat last N passwords
+- [ ] Implement password-less login via magic link
+- [ ] Add an option to update user's email
