@@ -10,7 +10,7 @@ require (
 	github.com/gorilla/csrf v1.7.2
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/joho/godotenv v1.5.1
-	github.com/pressly/goose/v3 v3.18.0
+	github.com/pressly/goose/v3 v3.19.2
 	golang.org/x/crypto v0.21.0
 )
 
