@@ -30,11 +30,7 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 				return "", fmt.Errorf("currentUser not implemeneted") //nolint:goerr113
 			},
 			"alerts": func() []string {
-				return []string{
-					"Don't do that!",
-					"The email address you provided is already associated with an account.",
-					"Something went wrong.",
-				}
+				return nil
 			},
 		},
 	)
@@ -54,15 +50,7 @@ func Must(t Template, err error) Template {
 	return t
 }
 
-//func Parse(filepath string) (Template, error) {
-//	tpl, err := template.ParseFiles(filepath)
-//	if err != nil {
-//		return Template{}, fmt.Errorf("parsing template: %w", err)
-//	}
-//	return Template{htmlTpl: tpl}, nil
-//}
-
-func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface{}) {
+func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface{}, errs ...error) {
 	tpl, err := t.htmlTpl.Clone()
 	if err != nil {
 		log.Printf("cloning template: %v", err)
@@ -76,6 +64,13 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface
 			},
 			"currentUser": func() *models.User {
 				return context.User(r.Context())
+			},
+			"alerts": func() []string {
+				var alerts []string
+				for _, e := range errs {
+					alerts = append(alerts, e.Error())
+				}
+				return alerts
 			},
 		})
 
