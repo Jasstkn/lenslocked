@@ -2,6 +2,7 @@ package views
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"html/template"
 	"io"
@@ -13,6 +14,10 @@ import (
 	"github.com/Jasstkn/lenslocked/models"
 	"github.com/gorilla/csrf"
 )
+
+type public interface {
+	Public() string
+}
 
 type Template struct {
 	htmlTpl *template.Template
@@ -57,6 +62,7 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface
 		http.Error(w, "There was an error executing the template.", http.StatusInternalServerError)
 		return
 	}
+	alerts := alertsMsgs(errs...)
 	tpl = tpl.Funcs(
 		template.FuncMap{
 			"csrfField": func() template.HTML {
@@ -66,10 +72,6 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface
 				return context.User(r.Context())
 			},
 			"alerts": func() []string {
-				var alerts []string
-				for _, e := range errs {
-					alerts = append(alerts, e.Error())
-				}
 				return alerts
 			},
 		})
@@ -84,4 +86,18 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface
 		return
 	}
 	io.Copy(w, &buffer) //nolint:errcheck
+}
+
+func alertsMsgs(errs ...error) []string {
+	var alerts []string
+	for _, e := range errs {
+		var pubErr public
+		if errors.As(e, &pubErr) {
+			alerts = append(alerts, pubErr.Public())
+		} else {
+			fmt.Println("error: ", e)
+			alerts = append(alerts, "Something went wrong.")
+		}
+	}
+	return alerts
 }
